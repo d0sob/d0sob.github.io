@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js"
+        }
+      }
+    </script>
+    <script type="module">
+      import * as THREE from "three";
+
+      new (class Main {
+        constructor() {
+          this.scene = new THREE.Scene();
+          this.camera = new THREE.PerspectiveCamera(
+            75,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+          );
+          this.renderer = new THREE.WebGLRenderer();
+
+          this.init();
+
+          this.animate = this.animate.bind(this);
+          this.onWindowResize = this.onWindowResize.bind(this);
+          window.addEventListener("resize", this.onWindowResize, false);
+          this.renderer.setAnimationLoop(this.animate);
+        }
+
+        init() {
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+          document.body.appendChild(this.renderer.domElement);
+
+          this.geometry = new THREE.BoxGeometry(1, 1, 1);
+          this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+          this.cube = new THREE.Mesh(this.geometry, this.material);
+          this.scene.add(this.cube);
+
+          this.camera.position.z = 5;
+        }
+
+        revolve() {
+          this.radius = 2;
+          this.speed = 0.001;
+          this.time = Date.now() * this.speed;
+
+          this.cube.position.x = this.radius * Math.cos(this.time);
+          this.cube.position.y = this.radius * Math.sin(this.time);
+        }
+
+        onWindowResize() {
+          this.camera.aspect = window.innerWidth / window.innerHeight;
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        animate() {
+          this.cube.rotation.x += 0.01;
+          this.cube.rotation.y += 0.01;
+          this.revolve();
+          this.renderer.render(this.scene, this.camera);
+        }
+      })();
+    </script>
+  </body>
+</html>
